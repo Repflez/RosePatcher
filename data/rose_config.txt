@@ -1,5 +1,5 @@
 #ur0 is default
-url0:file:///vol/content/index.html
+url0:https://tvii-prod.l1.jp.vino.wup.app.projectrose.cafe/
 
 # on/off debug print of client
 CallbackDebugPrint:0
@@ -36,7 +36,7 @@ TVStyle:2
 #LoadUrl
 # 0: Load from WhiteList (If not exist, load from url0.)
 # 1: Load from url0
-LoadUrl:0
+LoadUrl:1
 
 # 0/1 FriendList Contains Temporary Friend and Requested Friend or not.
 # 0:Not Contain
@@ -65,7 +65,7 @@ EnableEventLock:1
 # 1:File    (vino uses white-list on file, path is written at 'WhiteList_Path')
 # 2:Network (vino uses white-list on network, path is written at 'WhiteList_Path'. in this mode, white-list is downloaded with a paticular ssl certification for client and server.)
 # 3:Release (vino uses the final environment by each region.)
-WhiteList_Use:2
+WhiteList_Use:0
 WhiteList_Path:https://web-jp.l1.jp.vino.wup.app.projectrose.cafe/whitelist.txt?country=us
 
 # Allow 'file:' and 'http:' scheme. Finally, it is set to 'Not Allow'
