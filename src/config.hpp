@@ -1,4 +1,6 @@
 #pragma once
+#include <format>
+
 #include <wups.h>
 #include <wups/config.h>
 #include <wups/config/WUPSConfigCategory.h>
@@ -23,6 +25,9 @@
 
 
 namespace config {
+    // This isn't configuration, but we need to create the replacement token ASAP
+    // since I don't think we can generate it while in vino -ItzSwirlz
+    extern std::string replacementToken;
 
     extern bool connectToRose;
     extern bool tviiIconHBM;

@@ -53,6 +53,7 @@ namespace utils {
         if (ret < 0) {
             version = { .major = 0, .minor = 0, .patch = 0, .region = 'N' };
         }
+        MCP_Close(mcp);
         return version;
     }
 

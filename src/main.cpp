@@ -1,6 +1,7 @@
 #include <wups.h>
 #include <coreinit/title.h>
 #include <function_patcher/function_patching.h>
+#include <nn/act/client_cpp.h>
 #include <notifications/notifications.h>
 
 #include "config.hpp"
@@ -22,6 +23,7 @@ INITIALIZE_PLUGIN() {
   WHBLogModuleInit();
   WHBLogUdpInit();
   WHBLogCafeInit();
+  nn::act::Initialize();
   FunctionPatcher_InitLibrary();
 
   config::InitializeConfig();
@@ -41,6 +43,7 @@ INITIALIZE_PLUGIN() {
 DEINITIALIZE_PLUGIN() {
   patches::icon::perform_hbm_patches(false);
 
+  nn::act::Finalize();
   WHBLogModuleDeinit();
   WHBLogUdpDeinit();
   WHBLogCafeDeinit();

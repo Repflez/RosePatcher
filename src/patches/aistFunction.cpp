@@ -20,6 +20,7 @@ PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;
 
 DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_t* token, const char* client_id) {
+    memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
 
     if (client_id && utils::isVinoClientID(client_id) && config::connectToRose) {
         AISTCallCount++;
@@ -29,7 +30,10 @@ DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_
         return 0;
     }
 
-    return real_AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4(token, client_id);
+    // make sure we set the token again in case the following replaces it just in case
+    int realRet = real_AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4(token, client_id);
+    memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
+    return realRet;
 }
 
 DECL_FUNCTION(void, NSSLInit)

@@ -1,3 +1,4 @@
+#include <format>
 #include <wups.h>
 #include <wups/config.h>
 #include <wups/config/WUPSConfigCategory.h>
@@ -7,7 +8,9 @@
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <wups/config/WUPSConfigItemStub.h>
 #include <wups/storage.h>
+#include <coreinit/mcp.h>
 #include <coreinit/title.h>
+#include <nn/act/client_cpp.h>
 #include <sysapp/launch.h>
 
 #include "config.hpp"
@@ -15,7 +18,7 @@
 #include "utils/logger.h"
 
 namespace config {
-
+  std::string replacementToken;
   bool connectToRose = CONNECT_TO_ROSE_DEFUALT_VALUE;
   bool tviiIconHBM = TVII_ICON_HBM_PATCH_DEFAULT_VALUE;
   bool tviiIconWUM = TVII_ICON_WUM_PATCH_DEFAULT_VALUE;
@@ -110,6 +113,19 @@ namespace config {
     if ((storageRes = WUPSStorageAPI::GetOrStoreDefault(FORCE_JPN_CONSOLE_CONFIG_ID, forceJPNconsole, FORCE_JPN_CONSOLE_DEFAULT_VALUE)) != WUPS_STORAGE_ERROR_SUCCESS) {
       DEBUG_FUNCTION_LINE("GetOrStoreDefault failed: %s (%d)", WUPSStorageAPI_GetStatusStr(storageRes), storageRes);
     }
+
+    int handle = MCP_Open();
+    MCPSysProdSettings settings alignas(0x40);
+    MCPError error = MCP_GetSysProdSettings(handle, &settings);
+    if(error) {
+      replacementToken = "";
+      DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
+    }
+
+    MCP_Close(handle);
+
+    nn::act::PrincipalId pid = nn::act::GetPrincipalId();
+    replacementToken = std::format("{}{:d}", settings.serial_id, pid);
   }
 
 } // namespace config
