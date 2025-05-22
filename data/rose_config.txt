@@ -1,5 +1,5 @@
 #ur0 is default
-url0:https://tvii-prod.l1.jp.vino.wup.app.projectrose.cafe/
+url0:https://tvii-prod.l1.us.vino.wup.app.projectrose.cafe/
 
 # on/off debug print of client
 CallbackDebugPrint:0
@@ -13,7 +13,7 @@ AddTimeStampToDebugPrint:0
 WhiteList_VerifyServiceToken:1
 
 # 0/1 use whitelist cache on NAND
-WhiteList_UseCache:1
+WhiteList_UseCache:0
 
 # on/off javascript error print on console
 # 0:off, 1:on
