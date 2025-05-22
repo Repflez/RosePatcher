@@ -20,20 +20,17 @@ PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;
 
 DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_t* token, const char* client_id) {
-    memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
-
     if (client_id && utils::isVinoClientID(client_id) && config::connectToRose) {
         AISTCallCount++;
         DEBUG_FUNCTION_LINE("AISTCallCount is %d!", AISTCallCount);
         patches::ssl::addCertificateToWebKit();
         DEBUG_FUNCTION_LINE("Faking service sucess for '%s' (should be Vino)", client_id);
+	memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
         return 0;
     }
 
     // make sure we set the token again in case the following replaces it just in case
-    int realRet = real_AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4(token, client_id);
-    memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
-    return realRet;
+    return real_AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4(token, client_id);
 }
 
 DECL_FUNCTION(void, NSSLInit)

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <format>
 #include <wups.h>
 #include <wups/config.h>
@@ -125,7 +126,8 @@ namespace config {
     MCP_Close(handle);
 
     nn::act::PrincipalId pid = nn::act::GetPrincipalId();
-    replacementToken = std::format("{}{:d}", settings.serial_id, pid);
+    replacementToken = std::format("[0000, {}, {:d}, 000]", settings.serial_id, pid);
+    reverse(std::next(replacementToken.begin()), std::prev(replacementToken.end()));
   }
 
 } // namespace config
