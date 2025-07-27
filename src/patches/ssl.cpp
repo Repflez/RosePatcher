@@ -13,6 +13,10 @@
 
 namespace patches::ssl {
     void addCertificateToWebKit() {
+        if(config::certificateAdded) {
+            return;
+        }
+
         OSDynLoad_Module libwkc = 0;
         void* (*WKC_SSLRegisterRootCAByDER)(const char* cert, int cert_len) = nullptr;
 
@@ -32,14 +36,16 @@ namespace patches::ssl {
             return;
         }
 
-        void* ret1 = WKC_SSLRegisterRootCAByDER((const char *)(gts_der), gts_der_size);
+        WKC_SSLRegisterRootCAByDER((const char *)(gts_der), gts_der_size);
+        config::certificateAdded = true;
     }
 }; // namespace ssl
 
 DECL_FUNCTION(NSSLError, NSSLAddServerPKI, NSSLContextHandle context, NSSLServerCertId pki) {
-    if (config::connectToRose) {
-        NSSLError ret = NSSLAddServerPKIExternal(context, gts_der, gts_der_size, 0);
+    if (config::connectToRose && !config::gtsAdded) {
+        NSSLAddServerPKIExternal(context, gts_der, gts_der_size, 0);
         // DEBUG("Added GTS certificate to NSSL context. code: %d", ret);
+        config::gtsAdded = true;
     }
 
     return real_NSSLAddServerPKI(context, pki);

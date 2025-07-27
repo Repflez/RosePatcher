@@ -25,6 +25,8 @@ namespace config {
   bool tviiIconWUM = TVII_ICON_WUM_PATCH_DEFAULT_VALUE;
   bool forceJPNconsole = FORCE_JPN_CONSOLE_DEFAULT_VALUE;
   bool needRelaunch = false;
+  bool certificateAdded = false;
+  bool gtsAdded = false;
 
   // Connect to Rose setting event
   void connectToRoseChanged(ConfigItemBoolean *item, bool newValue) {

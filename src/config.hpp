@@ -34,6 +34,8 @@ namespace config {
     extern bool tviiIconWUM;
     extern bool needRelaunch;
     extern bool forceJPNconsole;
+    extern bool certificateAdded;
+    extern bool gtsAdded;
 
     void connectToRoseChanged(ConfigItemBoolean *item, bool newValue);
     void tviiIconHBMChanged(ConfigItemBoolean *item, bool newValue);
