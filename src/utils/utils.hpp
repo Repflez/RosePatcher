@@ -12,8 +12,6 @@ namespace utils {
     bool isVinoClientID(const char *client_id);
     bool isVinoTitleID(uint32_t title_id);
 
-    bool isWiiUMenuTitleID(uint32_t title_id, bool includeJPN = true);
-
     MCPSystemVersion getSystemVersion();
 
     char getConsoleRegion();

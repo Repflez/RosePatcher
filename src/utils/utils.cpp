@@ -19,10 +19,6 @@
 #define VINO_TITLE_ID_EU 0x000500301001320A
 #define VINO_CLIENT_ID_EU "8bc9387d0797e003c3210acfae01e109"
 
-#define WII_U_MENU_TITLE_ID_JP 0x5001010040000
-#define WII_U_MENU_TITLE_ID_US 0x5001010040100
-#define WII_U_MENU_TITLE_ID_EU 0x5001010040200
-
 namespace utils {
     MCPSystemVersion version = { .major = 0, .minor = 0, .patch = 0, .region = 'N' };
 
@@ -36,12 +32,6 @@ namespace utils {
         return title_id == VINO_TITLE_ID_JP || 
                title_id == VINO_TITLE_ID_US ||
                title_id == VINO_TITLE_ID_EU;
-    }
-
-    bool isWiiUMenuTitleID(uint32_t title_id, bool includeJPN) {
-        return (title_id == WII_U_MENU_TITLE_ID_JP && includeJPN) ||
-                title_id == WII_U_MENU_TITLE_ID_US ||
-                title_id == WII_U_MENU_TITLE_ID_EU;
     }
 
     MCPSystemVersion getSystemVersion() {

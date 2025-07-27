@@ -9,10 +9,12 @@
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <wups/config/WUPSConfigItemStub.h>
 #include <wups/storage.h>
+#include <coreinit/launch.h>
 #include <coreinit/mcp.h>
 #include <coreinit/title.h>
 #include <nn/act/client_cpp.h>
 #include <sysapp/launch.h>
+#include <sysapp/title.h>
 
 #include "config.hpp"
 #include "utils/utils.hpp"
@@ -52,7 +54,10 @@ namespace config {
 
     tviiIconWUM = newValue;
     auto title = OSGetTitleID();
-    if (utils::isWiiUMenuTitleID(title, false)) {
+
+    // https://github.com/PretendoNetwork/Inkay/blob/8da5fde9621d6b5d60adfa8af62d86d30a33882b/plugin/src/config.cpp#L123C1-L123C88
+    uint64_t wiiu_menu_tid = _SYSGetSystemApplicationTitleId(SYSTEM_APP_ID_WII_U_MENU);
+    if (title == wiiu_menu_tid) {
       needRelaunch = true;
     }
   }
@@ -84,9 +89,10 @@ namespace config {
   // Close event for the Aroma config menu
   void ConfigMenuClosedCallback() {
     WUPSStorageAPI::SaveStorage();
-    if (needRelaunch) {
-      _SYSLaunchTitleWithStdArgsInNoSplash(OSGetTitleID(), nullptr);
-      needRelaunch = false;
+    if (config::needRelaunch) {
+      OSForceFullRelaunch();
+      SYSLaunchMenu();
+      config::needRelaunch = false;
     }
   }
 
