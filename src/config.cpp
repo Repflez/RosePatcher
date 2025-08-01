@@ -21,6 +21,9 @@
 #include "utils/utils.hpp"
 #include "utils/logger.h"
 
+extern "C" MCPError MCP_GetDeviceId(int handle, char* out);
+extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
+
 namespace config {
   std::string replacementToken;
   bool connectToRose = CONNECT_TO_ROSE_DEFUALT_VALUE;
@@ -133,31 +136,47 @@ namespace config {
       DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
     }
 
-    MCP_Close(handle);
-
     char key[129];
+
+    // based on various sources
     // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
-    FILE *fp = fopen("fs:/vol/external01/wiiu/rose_key.txt", "r");
+    std::string filePath = std::format("fs:/vol/external01/wiiu/rose_key_{:d}.txt", nn::act::GetPrincipalId());
+    FILE *fp = fopen(filePath.c_str(), "r");
     if (!fp) {
-      DEBUG_FUNCTION_LINE("rose_key.txt not found in SD://wiiu/utag.txt");
-      return;
-    }
-    fread(key, 128, 1, fp);
-    fclose(fp);
+      DEBUG_FUNCTION_LINE("File %s found, generating a default.", filePath.c_str());
+      fclose(fp);
+      fp = fopen(filePath.c_str(), "w");
 
-    // yoinked from https://www.geeksforgeeks.org/dsa/removing-trailing-newline-character-from-fgets-input/
-    char* newlineCharPtr = strchr(key, '\n');
-    if (newlineCharPtr) {
-        *newlineCharPtr = 0;
+      // enable RNG
+      srand(time(NULL));
+
+      std::string newKey = "";
+
+      // open disclosure: made w/ help of chatgpt
+      for(int i = 0; i < 10; i++) {
+        int randNum = rand() % 62;
+        if (randNum < 26) {
+          newKey += 'a' + randNum;  // lowercase letters a-z
+        } else if (randNum < 52) {
+          newKey += 'A' + (randNum - 26);  // uppercase letters A-Z
+        } else {
+          newKey += '0' + (randNum - 52);  // digits 0-9
+        }
+      }
+
+      DEBUG_FUNCTION_LINE("%s", newKey.c_str());
+      fputs(newKey.c_str(), fp);
+      strcpy(key, newKey.c_str());
+
+      fclose(fp);
+    } else {
+      fread(key, 128, 1, fp);
+
+      fclose(fp);
     }
 
-    nn::act::PrincipalId pid = nn::act::GetPrincipalId();
-	  BSPHardwareVersion hw_ver;
-    BSPError err = bspGetHardwareVersion(&hw_ver);
-	if(err) {
-		DEBUG_FUNCTION_LINE("Error getting hardware version: %d", err);
-	}
-    replacementToken = std::format("[{:d}, {}, {}, {:d}, {}]", hw_ver, settings.code_id, settings.serial_id, pid, key);
+    MCP_Close(handle);
+    replacementToken = std::format("[{}, {}, {}]", key, settings.code_id, settings.serial_id);
     DEBUG_FUNCTION_LINE("Replacement token: %s", replacementToken.c_str());
     reverse(std::next(replacementToken.begin()), std::prev(replacementToken.end()));
   }
