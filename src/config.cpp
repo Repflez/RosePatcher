@@ -136,7 +136,7 @@ namespace config {
       DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
     }
 
-    char key[10];
+    char key[17];
 
     // based on various sources
     // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
@@ -153,7 +153,7 @@ namespace config {
       std::string newKey = "";
 
       // open disclosure: made w/ help of chatgpt
-      for(int i = 0; i < 10; i++) {
+      for(int i = 0; i < 17; i++) {
         int randNum = rand() % 62;
         if (randNum < 26) {
           newKey += 'a' + randNum;  // lowercase letters a-z
@@ -170,7 +170,7 @@ namespace config {
 
       fclose(fp);
     } else {
-      fread(key, 10, 1, fp);
+      fread(key, 17, 1, fp);
       DEBUG_FUNCTION_LINE("key: %s", key);
 
       fclose(fp);
