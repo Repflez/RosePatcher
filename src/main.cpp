@@ -1,11 +1,14 @@
 #include <wups.h>
 #include <coreinit/title.h>
+#include <curl/curl.h>
 #include <function_patcher/function_patching.h>
+#include <nn/ac.h>
 #include <nn/act/client_cpp.h>
 #include <notifications/notifications.h>
 
 #include "config.hpp"
 #include "patches/tviiIcon.hpp"
+#include "reminderpoller.hpp"
 #include "utils/Notification.hpp"
 #include "utils/logger.h"
 
@@ -26,6 +29,7 @@ INITIALIZE_PLUGIN() {
   nn::act::Initialize();
   FunctionPatcher_InitLibrary();
 
+  curl_global_init(CURL_GLOBAL_DEFAULT);
   config::InitializeConfig();
 
   // Check if NotificationModule library is initialized
@@ -41,6 +45,7 @@ INITIALIZE_PLUGIN() {
 }
 
 DEINITIALIZE_PLUGIN() {
+  curl_global_cleanup();
   patches::icon::perform_hbm_patches(false);
 
   nn::act::Finalize();
@@ -56,11 +61,19 @@ ON_APPLICATION_START() {
   WHBLogUdpInit();
   WHBLogCafeInit();
 
+  nn::ac::Initialize();
+  nn::ac::ConnectAsync();
+  nn::act::Initialize();
+
   auto title = OSGetTitleID();
   if (config::tviiIconWUM) {
     if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
       patches::icon::perform_men_patches(true);
     }
+  }
+
+  if(config::enableRemindPoll) {
+      reminderpoller::CreateReminderPoller();
   }
 }
 
@@ -68,5 +81,9 @@ ON_APPLICATION_ENDS() {
   auto title = OSGetTitleID();
   if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
     patches::icon::perform_men_patches(false);
+  }
+
+  if(config::enableRemindPoll) {
+    reminderpoller::should_kill = true;
   }
 }

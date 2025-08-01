@@ -36,6 +36,7 @@ namespace config {
     extern bool forceJPNconsole;
     extern bool certificateAdded;
     extern bool gtsAdded;
+    extern bool enableRemindPoll;
 
     void connectToRoseChanged(ConfigItemBoolean *item, bool newValue);
     void tviiIconHBMChanged(ConfigItemBoolean *item, bool newValue);

@@ -9,6 +9,7 @@
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <wups/config/WUPSConfigItemStub.h>
 #include <wups/storage.h>
+#include <coreinit/bsp.h>
 #include <coreinit/launch.h>
 #include <coreinit/mcp.h>
 #include <coreinit/title.h>
@@ -29,6 +30,7 @@ namespace config {
   bool needRelaunch = false;
   bool certificateAdded = false;
   bool gtsAdded = false;
+  bool enableRemindPoll = true;
 
   // Connect to Rose setting event
   void connectToRoseChanged(ConfigItemBoolean *item, bool newValue) {
@@ -133,8 +135,30 @@ namespace config {
 
     MCP_Close(handle);
 
+    char key[129];
+    // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
+    FILE *fp = fopen("fs:/vol/external01/wiiu/rose_key.txt", "r");
+    if (!fp) {
+      DEBUG_FUNCTION_LINE("rose_key.txt not found in SD://wiiu/utag.txt");
+      return;
+    }
+    fread(key, 128, 1, fp);
+    fclose(fp);
+
+    // yoinked from https://www.geeksforgeeks.org/dsa/removing-trailing-newline-character-from-fgets-input/
+    char* newlineCharPtr = strchr(key, '\n');
+    if (newlineCharPtr) {
+        *newlineCharPtr = 0;
+    }
+
     nn::act::PrincipalId pid = nn::act::GetPrincipalId();
-    replacementToken = std::format("[0000, {}, {:d}, 000]", settings.serial_id, pid);
+	  BSPHardwareVersion hw_ver;
+    BSPError err = bspGetHardwareVersion(&hw_ver);
+	if(err) {
+		DEBUG_FUNCTION_LINE("Error getting hardware version: %d", err);
+	}
+    replacementToken = std::format("[{:d}, {}, {}, {:d}, {}]", hw_ver, settings.code_id, settings.serial_id, pid, key);
+    DEBUG_FUNCTION_LINE("Replacement token: %s", replacementToken.c_str());
     reverse(std::next(replacementToken.begin()), std::prev(replacementToken.end()));
   }
 
