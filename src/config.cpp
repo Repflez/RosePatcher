@@ -136,7 +136,7 @@ namespace config {
       DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
     }
 
-    char key[17];
+    char key[20];
 
     // based on various sources
     // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
@@ -170,7 +170,8 @@ namespace config {
 
       fclose(fp);
     } else {
-      fread(key, 17, 1, fp);
+      fread(key, 20, 1, fp);
+      key[17] = '\0';
       DEBUG_FUNCTION_LINE("key: %s", key);
 
       fclose(fp);
