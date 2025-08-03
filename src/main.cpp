@@ -9,6 +9,7 @@
 #include "config.hpp"
 #include "patches/tviiIcon.hpp"
 #include "reminderpoller.hpp"
+#include "tokenthread.hpp"
 #include "utils/Notification.hpp"
 #include "utils/logger.h"
 
@@ -72,9 +73,10 @@ ON_APPLICATION_START() {
     }
   }
 
-  if(config::enableRemindPoll) {
+  if (config::enableRemindPoll) {
       reminderpoller::CreateReminderPoller();
   }
+  tokenthread::CreateTokenThread();
 }
 
 ON_APPLICATION_ENDS() {

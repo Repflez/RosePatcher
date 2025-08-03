@@ -12,6 +12,7 @@
 #include <nn/act.h>
 #include <thread>
 #include "utils/logger.h"
+#include "utils/token.hpp"
 
 namespace reminderpoller {
     bool running = false;
@@ -35,7 +36,7 @@ namespace reminderpoller {
                 curl_slist *headers = NULL;
                 std::string pidString = std::format("PID: {:d}", nn::act::GetPersistentId());
                 headers = curl_slist_append(headers, pidString.c_str());
-                std::string tokenString = std::format("Token: {:s}", config::replacementToken);
+                std::string tokenString = std::format("Token: {:s}", token::currentReplacementToken);
                 headers = curl_slist_append(headers, tokenString.c_str());
                 curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 

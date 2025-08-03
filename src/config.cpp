@@ -8,24 +8,16 @@
 #include <wups/config/WUPSConfigItemIntegerRange.h>
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <wups/config/WUPSConfigItemStub.h>
-#include <wups/storage.h>
-#include <coreinit/bsp.h>
 #include <coreinit/launch.h>
-#include <coreinit/mcp.h>
-#include <coreinit/title.h>
-#include <nn/act/client_cpp.h>
 #include <sysapp/launch.h>
 #include <sysapp/title.h>
 
 #include "config.hpp"
 #include "utils/utils.hpp"
 #include "utils/logger.h"
-
-extern "C" MCPError MCP_GetDeviceId(int handle, char* out);
-extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
+#include "utils/token.hpp"
 
 namespace config {
-  std::string replacementToken;
   bool connectToRose = CONNECT_TO_ROSE_DEFUALT_VALUE;
   bool tviiIconHBM = TVII_ICON_HBM_PATCH_DEFAULT_VALUE;
   bool tviiIconWUM = TVII_ICON_WUM_PATCH_DEFAULT_VALUE;
@@ -128,59 +120,7 @@ namespace config {
       DEBUG_FUNCTION_LINE("GetOrStoreDefault failed: %s (%d)", WUPSStorageAPI_GetStatusStr(storageRes), storageRes);
     }
 
-    int handle = MCP_Open();
-    MCPSysProdSettings settings alignas(0x40);
-    MCPError error = MCP_GetSysProdSettings(handle, &settings);
-    if(error) {
-      replacementToken = "";
-      DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
-    }
-
-    char key[20];
-
-    // based on various sources
-    // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
-    std::string filePath = std::format("fs:/vol/external01/wiiu/rose_key_{:d}.txt", nn::act::GetPrincipalId());
-    FILE *fp = fopen(filePath.c_str(), "r");
-    if (!fp) {
-      DEBUG_FUNCTION_LINE("File %s found, generating a default.", filePath.c_str());
-      fclose(fp);
-      fp = fopen(filePath.c_str(), "w");
-
-      // enable RNG
-      srand(time(NULL));
-
-      std::string newKey = "";
-
-      // open disclosure: made w/ help of chatgpt
-      for(int i = 0; i < 17; i++) {
-        int randNum = rand() % 62;
-        if (randNum < 26) {
-          newKey += 'a' + randNum;  // lowercase letters a-z
-        } else if (randNum < 52) {
-          newKey += 'A' + (randNum - 26);  // uppercase letters A-Z
-        } else {
-          newKey += '0' + (randNum - 52);  // digits 0-9
-        }
-      }
-
-      DEBUG_FUNCTION_LINE("%s", newKey.c_str());
-      fputs(newKey.c_str(), fp);
-      strcpy(key, newKey.c_str());
-
-      fclose(fp);
-    } else {
-      fread(key, 20, 1, fp);
-      key[17] = '\0';
-      DEBUG_FUNCTION_LINE("key: %s", key);
-
-      fclose(fp);
-    }
-
-    MCP_Close(handle);
-    replacementToken = std::format("[{}, {}, {}]", key, settings.code_id, settings.serial_id);
-    DEBUG_FUNCTION_LINE("Replacement token: %s", replacementToken.c_str());
-    reverse(std::next(replacementToken.begin()), std::prev(replacementToken.end()));
+    token::initToken();
   }
 
 } // namespace config

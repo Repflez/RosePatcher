@@ -15,6 +15,7 @@
 #include "../utils/logger.h"
 #include "../utils/utils.hpp"
 #include "../utils/patch.hpp"
+#include "../utils/token.hpp"
 
 PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;
@@ -25,7 +26,7 @@ DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_
         DEBUG_FUNCTION_LINE("AISTCallCount is %d!", AISTCallCount);
         patches::ssl::addCertificateToWebKit();
         DEBUG_FUNCTION_LINE("Faking service sucess for '%s' (should be Vino)", client_id);
-	memcpy(token, config::replacementToken.c_str(), config::replacementToken.size());
+	    memcpy(token, token::currentReplacementToken.c_str(), token::currentReplacementToken.size());
         return 0;
     }
 
@@ -33,8 +34,7 @@ DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_
     return real_AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4(token, client_id);
 }
 
-DECL_FUNCTION(void, NSSLInit)
-{
+DECL_FUNCTION(void, NSSLInit) {
     OSDynLoad_Module NN_ACT = 0;
     uint32_t AISTaddressVIR = 0;
     uint32_t AISTaddress = 0;
@@ -49,6 +49,8 @@ DECL_FUNCTION(void, NSSLInit)
     WHBLogModuleInit();
     WHBLogUdpInit();
     WHBLogCafeInit();
+    //token::updCurrentToken();
+
 
     // Notify about the patch
     DEBUG("Rosé Patcher: Trying to patch AcquireIndependentServiceToken via NSSLInit\n");
@@ -121,4 +123,4 @@ DECL_FUNCTION(void, NSSLInit)
     OSDynLoad_Release(NN_ACT);
 }
 
-WUPS_MUST_REPLACE_FOR_PROCESS(NSSLInit, WUPS_LOADER_LIBRARY_NSYSNET, NSSLInit, WUPS_FP_TARGET_PROCESS_TVII);
+WUPS_MUST_REPLACE_FOR_PROCESS(NSSLInit, WUPS_LOADER_LIBRARY_NSYSNET, NSSLInit, WUPS_FP_TARGET_PROCESS_ALL);
