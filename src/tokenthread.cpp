@@ -13,6 +13,8 @@
 namespace tokenthread {
     bool running = false;
     bool should_kill = false;
+    bool should_run_once = false;
+    nn::act::SlotNo lastSlotNo;
 
 	size_t callback(char* data, size_t size, size_t nmemb, void *userdata) {
 		DEBUG_FUNCTION_LINE("%s", data);
@@ -21,9 +23,14 @@ namespace tokenthread {
 
     void token_thread() {
         while(true) {
-            token::updCurrentToken();
+            nn::act::SlotNo res = nn::act::GetSlotNo();
+            if (lastSlotNo != res) {
+                lastSlotNo = res;
+                token::updCurrentToken();
+            }
             std::this_thread::sleep_for(std::chrono::seconds(5));
-            if(should_kill) {
+            if(should_kill || should_run_once) {
+                should_run_once = false;
                 break;
             }
         }

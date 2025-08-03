@@ -70,12 +70,14 @@ ON_APPLICATION_START() {
   if (config::tviiIconWUM) {
     if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
       patches::icon::perform_men_patches(true);
+      tokenthread::should_run_once = true;
     }
   }
 
   if (config::enableRemindPoll) {
       reminderpoller::CreateReminderPoller();
   }
+
   tokenthread::CreateTokenThread();
 }
 
@@ -88,4 +90,5 @@ ON_APPLICATION_ENDS() {
   if(config::enableRemindPoll) {
     reminderpoller::should_kill = true;
   }
+  tokenthread::should_kill = false;
 }
