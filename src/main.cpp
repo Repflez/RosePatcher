@@ -70,25 +70,27 @@ ON_APPLICATION_START() {
   if (config::tviiIconWUM) {
     if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
       patches::icon::perform_men_patches(true);
-      tokenthread::should_run_once = true;
     }
   }
 
   if (config::enableRemindPoll) {
       reminderpoller::CreateReminderPoller();
   }
-
   tokenthread::CreateTokenThread();
+  if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
+    tokenthread::should_kill = true;
+  }
 }
 
 ON_APPLICATION_ENDS() {
   auto title = OSGetTitleID();
   if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
     patches::icon::perform_men_patches(false);
+  } else {
+    tokenthread::should_kill = true;
   }
 
-  if(config::enableRemindPoll) {
+  if (config::enableRemindPoll) {
     reminderpoller::should_kill = true;
   }
-  tokenthread::should_kill = false;
 }
