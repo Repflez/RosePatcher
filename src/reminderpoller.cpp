@@ -57,6 +57,7 @@ namespace reminderpoller {
 
     void CreateReminderPoller() {
         try {
+            return; // Disabled for right now
             std::jthread reminderPollerThread(poll_thread);
 
             auto threadHandle = (OSThread*) reminderPollerThread.native_handle();
