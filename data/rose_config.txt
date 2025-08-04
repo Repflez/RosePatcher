@@ -1,5 +1,5 @@
 #ur0 is default
-url0:https://tvii-prod.l1.us.vino.wup.app.projectrose.cafe/
+url0:https://whitelist.l1.us.vino.wup.app.projectrose.cafe/
 
 # on/off debug print of client
 CallbackDebugPrint:0
