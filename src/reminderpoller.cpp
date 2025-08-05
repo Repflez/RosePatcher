@@ -30,7 +30,7 @@ namespace reminderpoller {
                 OSTime time = OSGetTime();
 
 				// TODO: URL at configure time
-                curl_easy_setopt(curl, CURLOPT_URL, "gitsecret");
+                curl_easy_setopt(curl, CURLOPT_URL, "https://projectrose.cafe/placeholder/lmao");
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
 
                 curl_slist *headers = NULL;
@@ -57,7 +57,6 @@ namespace reminderpoller {
 
     void CreateReminderPoller() {
         try {
-            return; // Disabled for right now
             std::jthread reminderPollerThread(poll_thread);
 
             auto threadHandle = (OSThread*) reminderPollerThread.native_handle();
