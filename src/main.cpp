@@ -15,7 +15,7 @@
 
 WUPS_PLUGIN_NAME("Rosé Patcher");
 WUPS_PLUGIN_DESCRIPTION("Patcher for Project Rosé's Nintendo TVii revival service.");
-WUPS_PLUGIN_VERSION("v1.2.1");
+WUPS_PLUGIN_VERSION("v1.2.2");
 WUPS_PLUGIN_AUTHOR("Project Rosé Team");
 WUPS_PLUGIN_LICENSE("GPLv2");
 
