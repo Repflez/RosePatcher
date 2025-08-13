@@ -93,6 +93,9 @@ namespace token {
     }
     
     void initToken() {
+        // enable RNG in case we need it.
+        srand(time(NULL));
+
         int handle = MCP_Open();
         MCPSysProdSettings settings alignas(0x40);
         MCPError error = MCP_GetSysProdSettings(handle, &settings);
@@ -107,28 +110,35 @@ namespace token {
         memcpy(serialId, settings.serial_id, sizeof(settings.serial_id));
         
         for (size_t i = 1; i < 12; i++) {
-            if (!nn::act::IsSlotOccupied(i)) return;
-            char key[20];
-            
-            unsigned int pID;
-            
+            if (!nn::act::IsSlotOccupied(i)) {
+                // No more accounts
+                DEBUG_FUNCTION_LINE("Slot %d not occupied", i);
+                return;
+            }
 
-            nn::act::GetPrincipalIdEx(&pID, i);
-            DEBUG_FUNCTION_LINE("pID: %d", pID);
+            char key[20];
+            unsigned int pid = 0;
+
+            nn::act::GetPrincipalIdEx(&pid, i);
+            DEBUG_FUNCTION_LINE("pid: %d", pid);
+            DEBUG_FUNCTION_LINE("index: %d", i);
+            if(pid == 0) {
+                DEBUG_FUNCTION_LINE("PID is 0; account probably not linked to NNID/PNID");
+                continue;
+            }
 
             // based on various sources
             // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
-            std::string filePath = "fs:/vol/external01/wiiu/rose_key_" + std::to_string(pID) + ".txt";
+            std::string filePath = "fs:/vol/external01/wiiu/rose_key_" + std::to_string(pid) + ".txt";
+            std::string newKey = "";
             FILE *fp = fopen(filePath.c_str(), "r");
             if (!fp) {
                 DEBUG_FUNCTION_LINE("File %s found, generating a default.", filePath.c_str());
                 fclose(fp);
                 fp = fopen(filePath.c_str(), "w");
 
-                // enable RNG
-                srand(time(NULL));
 
-                std::string newKey;
+                newKey = ""; // Ensure reset
 
                 // open disclosure: made w/ help of chatgpt
                 for(int i = 0; i < 17; i++) {
@@ -142,7 +152,7 @@ namespace token {
                     }
                 }
 
-                DEBUG_FUNCTION_LINE("%s", newKey.c_str());
+                DEBUG_FUNCTION_LINE("newKey: %s", newKey.c_str());
                 fputs(newKey.c_str(), fp);
                 strcpy(key, newKey.c_str());
 
