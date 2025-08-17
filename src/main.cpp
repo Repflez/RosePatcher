@@ -1,9 +1,12 @@
 #include <wups.h>
+#include <wups/config_api.h>
+
 #include <coreinit/title.h>
 #include <curl/curl.h>
 #include <function_patcher/function_patching.h>
 #include <nn/ac.h>
 #include <nn/act/client_cpp.h>
+#include <nn/result.h>
 #include <notifications/notifications.h>
 
 #include "config.hpp"
@@ -12,6 +15,7 @@
 #include "tokenthread.hpp"
 #include "utils/Notification.hpp"
 #include "utils/logger.h"
+#include "utils/token.hpp"
 
 WUPS_PLUGIN_NAME("Rosé Patcher");
 WUPS_PLUGIN_DESCRIPTION("Patcher for Project Rosé's Nintendo TVii revival service.");
@@ -94,3 +98,15 @@ ON_APPLICATION_ENDS() {
     reminderpoller::should_kill = true;
   }
 }
+
+// ensure we update
+DECL_FUNCTION(nn::Result, LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb, nn::act::SlotNo slot, nn::act::ACTLoadOption unk1, char const * unk2, bool unk3) {
+  // we should load first
+  nn::Result ret = real_LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb(slot, unk1, unk2, unk3);
+
+  tokenthread::should_run_once = true;
+
+  return ret;
+}
+
+WUPS_MUST_REPLACE(LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb, WUPS_LOADER_LIBRARY_NN_ACT, LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb);
