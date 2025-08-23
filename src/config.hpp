@@ -10,34 +10,18 @@
 #include <wups/config/WUPSConfigItemMultipleValues.h>
 #include <wups/config/WUPSConfigItemStub.h>
 
-#define CONNECT_TO_ROSE_CONFIG_ID "connect_to_rose"
-#define CONNECT_TO_ROSE_DEFUALT_VALUE true
-
-#define TVII_ICON_HBM_PATCH_COFNIG_ID "tvii_icon_hbm_patch"
-#define TVII_ICON_HBM_PATCH_DEFAULT_VALUE true
-
-#define TVII_ICON_WUM_PATCH_COFNIG_ID "tvii_icon_wum_patch"
-#define TVII_ICON_WUM_PATCH_DEFAULT_VALUE true
-
-#define FORCE_JPN_CONSOLE_CONFIG_ID "force_jpn_console"
-#define FORCE_JPN_CONSOLE_DEFAULT_VALUE false
-
-
+#define CONNECT_TO_RVERSE_CONFIG_ID "connect_to_rverse"
+#define CONNECT_TO_RVERSE_DEFUALT_VALUE true
 
 namespace config {
 
-    extern bool connectToRose;
-    extern bool tviiIconHBM;
-    extern bool tviiIconWUM;
+    extern bool connectToRverse;
     extern bool needRelaunch;
-    extern bool forceJPNconsole;
     extern bool certificateAdded;
     extern bool gtsAdded;
     extern bool enableRemindPoll;
 
-    void connectToRoseChanged(ConfigItemBoolean *item, bool newValue);
-    void tviiIconHBMChanged(ConfigItemBoolean *item, bool newValue);
-    void tviiIconWUMChanged(ConfigItemBoolean *item, bool newValue);
+    void connectToRverseChanged(ConfigItemBoolean *item, bool newValue);
 
     WUPSConfigAPICallbackStatus ConfigMenuOpenedCallback(WUPSConfigCategoryHandle rootHandle);
     

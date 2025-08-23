@@ -19,19 +19,21 @@ WUMS_ROOT := $(DEVKITPRO)/wums
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #-------------------------------------------------------------------------------
-TARGET		:=	RosePatcher
+TARGET		:=	rverse
 BUILD		:=	build
 SOURCES		:=	src src/utils src/patches
 DATA		:=	data
 INCLUDES	:=	src
+TOKEN_KEY 	?=
 
 #-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
 			$(MACHDEP)
 
 CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__
+CPPFLAGS += -DTOKEN_KEY=\"$(TOKEN_KEY)\"
 
 CXXFLAGS	:= $(CFLAGS) -std=c++23
 
@@ -44,7 +46,7 @@ LIBS	:= -lwups -lnotifications -lfunctionpatcher -lwut -lkernel -lcurlwrapper
 # list of directories containing libraries, this must be the top level
 # containing include and lib
 #-------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(WUPS_ROOT) $(WUMS_ROOT) $(WUT_ROOT) $(WUT_ROOT)/usr
+LIBDIRS	:= $(PORTLIBS) $(WUPS_ROOT) $(WUMS_ROOT) $(WUT_ROOT) $(WUT_ROOT)/usr /opt/devkitpro/custom/curl
 
 #-------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional

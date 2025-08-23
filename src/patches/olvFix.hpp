@@ -9,4 +9,5 @@ namespace patches::olv {
 
     void osdynload_notify_callback(OSDynLoad_Module module, void *ctx,
                                    OSDynLoad_NotifyReason reason, OSDynLoad_NotifyData *rpl);
+    bool Initialize();
 } // namespace olv

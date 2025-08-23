@@ -10,28 +10,28 @@
 #include "utils.hpp"
 #include "../config.hpp"
 
-#define VINO_TITLE_ID_JP 0x000500301001300A
-#define VINO_CLIENT_ID_JP "547e315c1966905040e2d48dff24439a"
+#define OLV_TITLE_ID_JP 0x000500301001600A
+#define OLV_CLIENT_ID_JP "a2efa818a34fa16b8afbc8a74eba3eda" // REPLACEME
 
-#define VINO_TITLE_ID_US 0x000500301001310A
-#define VINO_CLIENT_ID_US "87a44dad436407e4ec47ad42ed68bf8c"
+#define OLV_TITLE_ID_US 0x000500301001610A
+#define OLV_CLIENT_ID_US "a2efa818a34fa16b8afbc8a74eba3eda"
 
-#define VINO_TITLE_ID_EU 0x000500301001320A
-#define VINO_CLIENT_ID_EU "8bc9387d0797e003c3210acfae01e109"
+#define OLV_TITLE_ID_EU 0x000500301001620A
+#define OLV_CLIENT_ID_EU "87cd32617f1985439ea608c2746e4610" // REPLACEME
 
 namespace utils {
     MCPSystemVersion version = { .major = 0, .minor = 0, .patch = 0, .region = 'N' };
 
-    bool isVinoClientID(const char *client_id) {
-        return strcmp(client_id, VINO_CLIENT_ID_JP) == 0 ||
-               strcmp(client_id, VINO_CLIENT_ID_US) == 0 ||
-               strcmp(client_id, VINO_CLIENT_ID_EU) == 0;
+    bool isMiiverseClientID(const char *client_id) {
+        return strcmp(client_id, OLV_CLIENT_ID_JP) == 0 ||
+               strcmp(client_id, OLV_CLIENT_ID_US) == 0 ||
+               strcmp(client_id, OLV_CLIENT_ID_EU) == 0;
     }
 
-    bool isVinoTitleID(uint32_t title_id) {
-        return title_id == VINO_TITLE_ID_JP || 
-               title_id == VINO_TITLE_ID_US ||
-               title_id == VINO_TITLE_ID_EU;
+    bool isMiiverseTitleID(uint32_t title_id) {
+        return title_id == OLV_TITLE_ID_JP || 
+               title_id == OLV_TITLE_ID_US ||
+               title_id == OLV_TITLE_ID_EU;
     }
 
     MCPSystemVersion getSystemVersion() {
@@ -49,18 +49,6 @@ namespace utils {
 
     char getConsoleRegion() {
         return getSystemVersion().region;
-    }
-
-    bool isJapanConsole() {
-        return getConsoleRegion() == 'J' || config::forceJPNconsole;
-    }
-
-    bool isUSAConsole() {
-        return getConsoleRegion() == 'U';
-    }
-
-    bool isEuropeConsole() {
-        return getConsoleRegion() == 'E';
     }
 
     bool is555OrHigher() {

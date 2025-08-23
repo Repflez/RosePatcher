@@ -10,20 +10,19 @@
 #include <notifications/notifications.h>
 
 #include "config.hpp"
-#include "patches/tviiIcon.hpp"
-#include "reminderpoller.hpp"
 #include "tokenthread.hpp"
 #include "utils/Notification.hpp"
 #include "utils/logger.h"
 #include "utils/token.hpp"
+#include "patches/olvFix.hpp"
 
-WUPS_PLUGIN_NAME("Rosé Patcher");
-WUPS_PLUGIN_DESCRIPTION("Patcher for Project Rosé's Nintendo TVii revival service.");
-WUPS_PLUGIN_VERSION("v1.2.2");
-WUPS_PLUGIN_AUTHOR("Project Rosé Team");
+WUPS_PLUGIN_NAME("rverse");
+WUPS_PLUGIN_DESCRIPTION("Patcher to allow rverse access, based on Project Rosé's Patcher.");
+WUPS_PLUGIN_VERSION("v0.0.1");
+WUPS_PLUGIN_AUTHOR("rverseTeam & Project Rosé Team");
 WUPS_PLUGIN_LICENSE("GPLv2");
 
-WUPS_USE_STORAGE("rosepatcher");
+WUPS_USE_STORAGE("rverse");
 WUPS_USE_WUT_DEVOPTAB();
 
 INITIALIZE_PLUGIN() {
@@ -42,16 +41,15 @@ INITIALIZE_PLUGIN() {
     DEBUG_FUNCTION_LINE("NotificationModule_InitLibrary failed");
   }
 
-  if (config::connectToRose) {
-    ShowNotification("Rosé patch enabled");
+  if (config::connectToRverse) {
+    ShowNotification("rverse patch enabled");
   } else {
-    ShowNotification("Rosé patch disabled");
+    ShowNotification("rverse patch disabled");
   }
 }
 
 DEINITIALIZE_PLUGIN() {
   curl_global_cleanup();
-  patches::icon::perform_hbm_patches(false);
 
   nn::act::Finalize();
   WHBLogModuleDeinit();
@@ -66,20 +64,13 @@ ON_APPLICATION_START() {
   WHBLogUdpInit();
   WHBLogCafeInit();
 
+  patches::olv::Initialize();
   nn::ac::Initialize();
   nn::ac::ConnectAsync();
   nn::act::Initialize();
 
   auto title = OSGetTitleID();
-  if (config::tviiIconWUM) {
-    if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
-      patches::icon::perform_men_patches(true);
-    }
-  }
 
-  if (config::enableRemindPoll) {
-      reminderpoller::CreateReminderPoller();
-  }
   tokenthread::CreateTokenThread();
   if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
     tokenthread::should_kill = true;
@@ -88,14 +79,8 @@ ON_APPLICATION_START() {
 
 ON_APPLICATION_ENDS() {
   auto title = OSGetTitleID();
-  if (title == 0x5001010040000 || title == 0x5001010040100 || title == 0x5001010040200) {
-    patches::icon::perform_men_patches(false);
-  } else {
+  if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
     tokenthread::should_kill = true;
-  }
-
-  if (config::enableRemindPoll) {
-    reminderpoller::should_kill = true;
   }
 }
 

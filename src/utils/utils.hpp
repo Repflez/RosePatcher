@@ -9,15 +9,12 @@
 #include <vector>
 
 namespace utils {
-    bool isVinoClientID(const char *client_id);
-    bool isVinoTitleID(uint32_t title_id);
+    bool isMiiverseClientID(const char *client_id);
+    bool isMiiverseTitleID(uint32_t title_id);
 
     MCPSystemVersion getSystemVersion();
 
     char getConsoleRegion();
-    bool isJapanConsole();
-    bool isUSAConsole();
-    bool isEuropeConsole();
 
     bool is555OrHigher();
 }; // namespace utils

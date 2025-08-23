@@ -20,7 +20,7 @@ namespace patches::ssl {
         OSDynLoad_Module libwkc = 0;
         void* (*WKC_SSLRegisterRootCAByDER)(const char* cert, int cert_len) = nullptr;
 
-        if (!config::connectToRose) {
+        if (!config::connectToRverse) {
             return;
         }
 
@@ -42,13 +42,13 @@ namespace patches::ssl {
 }; // namespace ssl
 
 DECL_FUNCTION(NSSLError, NSSLAddServerPKI, NSSLContextHandle context, NSSLServerCertId pki) {
-    if (config::connectToRose && !config::gtsAdded) {
+    if (config::connectToRverse && !config::gtsAdded) {
         NSSLAddServerPKIExternal(context, gts_der, gts_der_size, 0);
-        // DEBUG("Added GTS certificate to NSSL context. code: %d", ret);
+        DEBUG_FUNCTION_LINE("Added GTS certificate to NSSL context");
         config::gtsAdded = true;
     }
 
     return real_NSSLAddServerPKI(context, pki);
 }
 
-WUPS_MUST_REPLACE_FOR_PROCESS(NSSLAddServerPKI, WUPS_LOADER_LIBRARY_NSYSNET, NSSLAddServerPKI, WUPS_FP_TARGET_PROCESS_TVII);
+WUPS_MUST_REPLACE_FOR_PROCESS(NSSLAddServerPKI, WUPS_LOADER_LIBRARY_NSYSNET, NSSLAddServerPKI, WUPS_FP_TARGET_PROCESS_MIIVERSE);

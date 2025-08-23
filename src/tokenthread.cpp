@@ -41,7 +41,7 @@ namespace tokenthread {
             std::jthread tokenThread(token_thread);
 
             auto threadHandle = (OSThread*) tokenThread.native_handle();
-            OSSetThreadName(threadHandle, "TVii Token Account Handler");
+            OSSetThreadName(threadHandle, "rverse Token Account Handler");
             OSSetThreadAffinity(threadHandle, OS_THREAD_ATTRIB_AFFINITY_ANY);
 
             tokenThread.detach();

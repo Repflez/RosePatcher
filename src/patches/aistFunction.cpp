@@ -21,11 +21,11 @@ PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;
 
 DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_t* token, const char* client_id) {
-    if (client_id && utils::isVinoClientID(client_id) && config::connectToRose) {
+    if (client_id && utils::isMiiverseClientID(client_id) && config::connectToRverse) {
         AISTCallCount++;
         DEBUG_FUNCTION_LINE("AISTCallCount is %d!", AISTCallCount);
         patches::ssl::addCertificateToWebKit();
-        DEBUG_FUNCTION_LINE("Faking service sucess for '%s' (should be Vino)", client_id);
+        DEBUG_FUNCTION_LINE("Faking service sucess for '%s' (should be Miiverse)", client_id);
 	    memcpy(token, token::currentReplacementToken.c_str(), token::currentReplacementToken.size());
         return 0;
     }
@@ -53,7 +53,7 @@ DECL_FUNCTION(void, NSSLInit) {
 
 
     // Notify about the patch
-    DEBUG("Rosé Patcher: Trying to patch AcquireIndependentServiceToken via NSSLInit\n");
+    DEBUG("rverse: Trying to patch AcquireIndependentServiceToken via NSSLInit\n");
 
     FunctionPatcher_IsFunctionPatched(AISTpatchHandleBetter, &isAlreadyPatched);
 
@@ -70,8 +70,8 @@ DECL_FUNCTION(void, NSSLInit) {
         //return;
     }
 
-    if (!config::connectToRose) {
-        DEBUG_FUNCTION_LINE("\"Connect to Rosé\" patch is disabled, skipping...");
+    if (!config::connectToRverse) {
+        DEBUG_FUNCTION_LINE("\"Connect to rverse\" patch is disabled, skipping...");
         return;
     }
 
@@ -101,7 +101,7 @@ DECL_FUNCTION(void, NSSLInit) {
       AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4,
       AISTaddress,
       AISTaddressVIR,
-      FP_TARGET_PROCESS_TVII);
+      FP_TARGET_PROCESS_MIIVERSE);
 
     // Patch the function
     if(FunctionPatcher_AddFunctionPatch(&AISTpatch, &AISTpatchHandle, &AISTpatchSuccess) != FunctionPatcherStatus::FUNCTION_PATCHER_RESULT_SUCCESS) {
@@ -123,4 +123,4 @@ DECL_FUNCTION(void, NSSLInit) {
     OSDynLoad_Release(NN_ACT);
 }
 
-WUPS_MUST_REPLACE_FOR_PROCESS(NSSLInit, WUPS_LOADER_LIBRARY_NSYSNET, NSSLInit, WUPS_FP_TARGET_PROCESS_TVII);
+WUPS_MUST_REPLACE_FOR_PROCESS(NSSLInit, WUPS_LOADER_LIBRARY_NSYSNET, NSSLInit, WUPS_FP_TARGET_PROCESS_MIIVERSE);

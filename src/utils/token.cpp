@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <format>
 #include <string>
+#include <typeinfo>
+
 #include <wups.h>
 #include <wups/storage.h>
 #include <coreinit/bsp.h>
@@ -15,9 +17,12 @@
 #include "utils/utils.hpp"
 #include "utils/logger.h"
 #include "utils/Notification.hpp"
+#include "obfuscate.hpp"
 
 extern "C" MCPError MCP_GetDeviceId(int handle, char* out);
 extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
+
+#define EXPECTED_TOKEN_LENGTH 32
 
 namespace token {
     std::string currentReplacementToken;
@@ -35,6 +40,12 @@ namespace token {
     char replacementToken12[20];
     char codeId[8];
     char serialId[12];
+
+#ifndef TOKEN_KEY
+    #error TOKEN_KEY is not defined
+#else
+    _Static_assert((sizeof(TOKEN_KEY) - 1) == EXPECTED_TOKEN_LENGTH, "Invalid TOKEN_KEY length!");
+#endif
 
     void setReplacementToken(char token[20], nn::act::SlotNo slot) {
         // really stupid thing i am gonna do but yeahaha
@@ -102,12 +113,15 @@ namespace token {
 
         if(error) {
             DEBUG_FUNCTION_LINE("MCP_GetSysProdSettings failed");
-            ShowNotification("Rose: Failed to get Wii U Settings. You will not be able to launch TVii. Try again via rebooting.");
+            ShowNotification("rverse: Failed to get Wii U Settings. You will not be able to launch Miiverse. Try again via rebooting.");
             return;
         }
         
         memcpy(codeId, settings.code_id, sizeof(settings.code_id));
         memcpy(serialId, settings.serial_id, sizeof(settings.serial_id));
+
+        DEBUG_FUNCTION_LINE("codeId: %s", codeId);
+        DEBUG_FUNCTION_LINE("serialId: %s", serialId);
         
         for (size_t i = 1; i < 12; i++) {
             if (!nn::act::IsSlotOccupied(i)) {
@@ -129,7 +143,7 @@ namespace token {
 
             // based on various sources
             // from https://github.com/RiiConnect24/UTag/blob/2287ef6c21e18de77162360cca53c1ccb1b30759/src/main.cpp#L26
-            std::string filePath = "fs:/vol/external01/wiiu/rose_key_" + std::to_string(pid) + ".txt";
+            std::string filePath = "fs:/vol/external01/wiiu/rv_key_" + std::to_string(pid) + ".txt";
             std::string newKey = "";
             FILE *fp = fopen(filePath.c_str(), "r");
             if (!fp) {
