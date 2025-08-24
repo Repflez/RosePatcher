@@ -4,7 +4,7 @@
 
 namespace token
 {
-    extern std::string currentReplacementToken;
+    extern std::string currentToken;
 
     void setReplacementToken(std::string token, nn::act::SlotNo slot);
     void initToken();

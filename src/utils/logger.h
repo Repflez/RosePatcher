@@ -13,21 +13,21 @@
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILENAME_X__)
 
 #define OSFATAL_FUNCTION_LINE(FMT, ARGS...)do { \
-    OSFatal_printf("[(P)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
+    OSFatal_printf("[(F)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
     } while (0)
 
 #define DEBUG_FUNCTION_LINE(FMT, ARGS...)do { \
-    WHBLogPrintf("[(P)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
+    WHBLogPrintf("[(L)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
     } while (0);
 
 #define DEBUG_FUNCTION_LINE_WRITE(FMT, ARGS...)do { \
-    WHBLogWritef("[(P)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
+    WHBLogWritef("[(W)             rverse][%23s]%30s@L%04d: " FMT "",__FILENAME__,__FUNCTION__, __LINE__, ## ARGS); \
     } while (0);
 
 #define DEBUG(FMT, ARGS...)do { \
-    WHBLogPrintf("[(P)             rverse]: " FMT "", ## ARGS); \
+    WHBLogPrintf("[(D)             rverse]: " FMT "", ## ARGS); \
     } while (0);
 
 #define DEBUG_WRITE(FMT, ARGS...)do { \
-    WHBLogWritef("[(P)             rverse]: " FMT "", ## ARGS); \
+    WHBLogWritef("[(Q)             rverse]: " FMT "", ## ARGS); \
     } while (0);

@@ -26,7 +26,7 @@ DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_
         DEBUG_FUNCTION_LINE("AISTCallCount is %d!", AISTCallCount);
         patches::ssl::addCertificateToWebKit();
         DEBUG_FUNCTION_LINE("Faking service sucess for '%s' (should be Miiverse)", client_id);
-	    memcpy(token, token::currentReplacementToken.c_str(), token::currentReplacementToken.size());
+	    memcpy(token, token::currentToken.c_str(), token::currentToken.size());
         return 0;
     }
 
