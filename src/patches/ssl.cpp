@@ -13,7 +13,7 @@
 
 namespace patches::ssl {
     void addCertificateToWebKit() {
-        if(config::certificateAdded) {
+        if (config::certificateAdded) {
             return;
         }
 

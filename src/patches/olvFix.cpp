@@ -31,7 +31,7 @@ const char wave_new[] = {
 
 namespace patches::olv {
     const char original_discovery_url[] = "discovery.olv.nintendo.net/v1/endpoint";
-    const char new_discovery_url[]      = "manon.dev.rverse.club/v1/endpoint";
+    const char new_discovery_url[]      = SERVER_URL;
 
     _Static_assert(sizeof(original_discovery_url) > sizeof(new_discovery_url),
                     "new_discovery_url too long! Must be less than 38chars.");
@@ -39,12 +39,9 @@ namespace patches::olv {
     void osdynload_notify_callback(OSDynLoad_Module module, void *ctx,
                                    OSDynLoad_NotifyReason reason, OSDynLoad_NotifyData *rpl) {
         if (reason == OS_DYNLOAD_NOTIFY_LOADED) {
-            if (!rpl->name)
-                return;
-            
+            if (!rpl->name) return;
             if (!std::string_view(rpl->name).ends_with("nn_olv.rpl") || !config::connectToRverse)
                 return;
-
 
             utils::patch::replace_mem(rpl->dataAddr, rpl->dataSize, original_discovery_url,
                         sizeof(original_discovery_url), new_discovery_url, sizeof(new_discovery_url));
@@ -103,17 +100,17 @@ DECL_FUNCTION(int, FSOpenFile_OLV, FSClient *client, FSCmdBlock *block, char *pa
         } else if (strcmp("vol/content/browser/rootca.pem", path) == 0) {
             // The CA chain is added here :)
             int ret = real_FSOpenFile_OLV(client, block, path, mode, handle, error);
-            
+
             rootCAPemHandle = *handle;
-            
+
             DEBUG_FUNCTION_LINE("replacing Miiverse CA with bundled chain");
-            
+
             return ret;
         }
     } else {
         DEBUG_FUNCTION_LINE("patches disabled, skipping process");
     }
-    
+
     return real_FSOpenFile_OLV(client, block, path, mode, handle, error);
 }
 

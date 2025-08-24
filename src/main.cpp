@@ -41,10 +41,14 @@ INITIALIZE_PLUGIN() {
     DEBUG_FUNCTION_LINE("NotificationModule_InitLibrary failed");
   }
 
-  if (config::connectToRverse) {
-    ShowNotification("rverse patch enabled");
+  if (config::goodToGo) {
+    if (config::connectToRverse) {
+      ShowNotification("rverse patch enabled");
+    } else {
+      ShowNotification("rverse patch disabled");
+    }
   } else {
-    ShowNotification("rverse patch disabled");
+    ShowNotification("rverse patch error. Please follow the instructions when installing.");
   }
 }
 

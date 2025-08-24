@@ -16,11 +16,6 @@ namespace tokenthread {
     bool should_run_once = false;
     nn::act::SlotNo lastSlotNo;
 
-	size_t callback(char* data, size_t size, size_t nmemb, void *userdata) {
-		DEBUG_FUNCTION_LINE("%s", data);
-		return size *  nmemb;
-	}
-
     void token_thread() {
         while(true) {
             nn::act::SlotNo res = nn::act::GetSlotNo();

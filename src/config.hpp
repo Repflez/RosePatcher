@@ -19,7 +19,7 @@ namespace config {
     extern bool needRelaunch;
     extern bool certificateAdded;
     extern bool gtsAdded;
-    extern bool enableRemindPoll;
+    extern bool goodToGo;
 
     void connectToRverseChanged(ConfigItemBoolean *item, bool newValue);
 

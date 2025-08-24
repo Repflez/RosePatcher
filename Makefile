@@ -26,13 +26,23 @@ DATA		:=	data
 INCLUDES	:=	src
 
 #-------------------------------------------------------------------------------
+# rverse default variables
+# TOKEN_KEY is the key to create hashes and other related hashing data to tokens
+# ENVELOPE_KEY is used to encrypt tokens before they're used
+# SERVER_URL is the Discovery address. It must be below 38 characters
+#-------------------------------------------------------------------------------
+TOKEN_KEY ?= 00000000000000000000000000000000
+ENVELOPE_KEY ?= 00000000000000000000000000000000
+SERVER_URL ?= manon.dev.rverse.club/v1/endpoint
+
+#-------------------------------------------------------------------------------
 # options for code generation
 #-------------------------------------------------------------------------------
 CFLAGS	:=	-g -Wall -O3 -ffunction-sections \
 			$(MACHDEP)
 
 CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -D__WUPS__
-CPPFLAGS += -DTOKEN_KEY=\"$(TOKEN_KEY)\" -DENVELOPE_KEY=\"$(ENVELOPE_KEY)\"
+CPPFLAGS += -DTOKEN_KEY=\"$(TOKEN_KEY)\" -DENVELOPE_KEY=\"$(ENVELOPE_KEY)\" -DSERVER_URL=\"$(SERVER_URL)\"
 
 CXXFLAGS	:= $(CFLAGS) -std=c++23
 

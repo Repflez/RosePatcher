@@ -118,5 +118,4 @@ namespace utils::patch {
 
         return false;
     }
-    
 }; // namespace patch

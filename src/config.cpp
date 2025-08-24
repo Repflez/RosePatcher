@@ -22,7 +22,7 @@ namespace config {
   bool needRelaunch = false;
   bool certificateAdded = false;
   bool gtsAdded = false;
-  bool enableRemindPoll = true;
+  bool goodToGo = true;
 
   // Connect to rverse setting event
   void connectToRverseChanged(ConfigItemBoolean *item, bool newValue) {

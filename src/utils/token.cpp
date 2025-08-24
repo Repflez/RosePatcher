@@ -18,6 +18,7 @@
 #include <sysapp/title.h>
 
 #include "token.hpp"
+#include "config.hpp"
 #include "utils.hpp"
 #include "logger.h"
 #include "Notification.hpp"
@@ -34,7 +35,7 @@ extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
 #define TOKEN_VERSION 1
 
 namespace nn::act {
-    static constexpr size_t UrlSize   = 257;
+    static constexpr size_t UrlSize = 257;
 
     nn::Result GetMiiImageUrlEx(char outUrl[UrlSize], SlotNo slot)
         asm("GetMiiImageUrlEx__Q2_2nn3actFPcUc");
@@ -45,6 +46,8 @@ namespace token {
     std::vector<std::string> rverseTokens(12);
     std::vector<std::string> accountNames(12);
     std::string otpHash = "nohash";
+
+    size_t currentSlot = 0;
 
     char codeId[8];
     char serialId[12];
@@ -67,7 +70,7 @@ namespace token {
         return ss.str();
     }
 
-    void getOTPHash() {
+    bool getOTPHash() {
         std::string otpPath = "fs:/vol/external01/otp.bin";
 
         std::ifstream file(otpPath, std::ios::binary);
@@ -75,7 +78,7 @@ namespace token {
         if (!file) {
             DEBUG("Either the OTP path in %s is dead, or this SD Card may be dying", otpPath.c_str());
             file.close();
-            return;
+            return false;
         }
 
         std::vector<char> wiiUDevicePrivateKey(0x1E);
@@ -95,12 +98,14 @@ namespace token {
 
         const uint8_t* str = reinterpret_cast<const uint8_t*>(wiiUDevicePrivateKey.data());
         preHash.append(bytes_to_hex(str, sizeof(str)));
-        
+
         str = reinterpret_cast<const uint8_t*>(wiiUDeviceUniqueCertificatePrivateKey.data());
         preHash.append(bytes_to_hex(str, sizeof(str)));
-        
+
         str = reinterpret_cast<const uint8_t*>(wiiUDeviceUniqueCertificateSignature.data());
         preHash.append(bytes_to_hex(str, sizeof(str)));
+
+        file.close();
 
         // Hash the OTP now
         size_t key_size = strlen(OBFUSCATE(TOKEN_KEY));
@@ -112,7 +117,7 @@ namespace token {
 
         uint8_t hashedOtp[64];
         crypto_sha512_hmac(hashedOtp, key, key_size, msg_data, msg_size);
-        
+
         // TODO: Wipe preHash and str
 
         // Clear the key now, as soon we finished using it
@@ -124,13 +129,16 @@ namespace token {
 
         // Clear the raw hash data, we don't need it
         crypto_wipe(hashedOtp, 64);
-        
-        file.close();
+
+        return true;
     }
     
     void initToken() {
         // Before we do anything, we have to load the OTP
-        getOTPHash();
+        if (!getOTPHash()) {
+            DEBUG("hashing failed, we're out");
+            return;
+        }
 
         // enable RNG in case we need it.
         srand(time(NULL));
@@ -160,8 +168,8 @@ namespace token {
             ShowNotification("rverse: Failed to start the plugin. You will not be able to launch rverse. Try again via rebooting.");
             return;
         }
-        
-        
+
+
         for (size_t i = 1; i < 12; i++) {
             if (!nn::act::IsSlotOccupied(i)) {
                 // No more accounts
@@ -197,9 +205,9 @@ namespace token {
             
             uint8_t hashedFilename[64];
             crypto_sha512_hmac(hashedFilename, key, key_size, msg_data, msg_size);
-            
+
             std::string finalFilename = bytes_to_hex(hashedFilename, 64);
-            
+
             // Clear from memory our stuff
             crypto_wipe(key, key_size);
             crypto_wipe(hashedFilename, 64); // Clear the raw HMAC data from memory
@@ -225,7 +233,7 @@ namespace token {
                 // It was made with AI, though.
                 for (int i = 0; i < TOKEN_LENGTH; i++) {
                     int randNum = rand() % 62;
-                    
+
                     if (randNum < 26) {
                         newToken += 'a' + randNum;
                     } else if (randNum < 52) {
@@ -251,13 +259,15 @@ namespace token {
             fclose(fp);
         }
         MCP_Close(handle);
+
+        config::goodToGo = true;
     }
 
     void make_envelope_nonce(const uint8_t* unique_str, uint8_t nonce[24]) {
         size_t key_size = strlen(OBFUSCATE(TOKEN_KEY));
         uint8_t* key = new uint8_t[key_size];
         memcpy(key, OBFUSCATE(TOKEN_KEY), key_size);
-        
+
         crypto_poly1305(
             nonce,              // uint8_t mac[16]
             unique_str,         // const uint8_t *message
@@ -276,12 +286,19 @@ namespace token {
     void updCurrentToken() {
         size_t slotNo = nn::act::GetSlotNo();
 
+        if (slotNo == 0) return;
+        if (slotNo == currentSlot) return;
+
+        currentSlot = slotNo;
+
+        DEBUG("current slot is %d, updating the token", slotNo);
+
         int16_t miiNameTemp[nn::act::UrlSize]; // I have seen some Miis with tons of data in the name, this should get them all
         nn::act::GetMiiNameEx(miiNameTemp, slotNo);
 
         char miiImageUrl[nn::act::UrlSize];
         nn::act::GetMiiImageUrlEx(miiImageUrl, slotNo);
-        
+
         unsigned int pid = nn::act::GetPrincipalId();
 
         std::string isNintendoAccount;
@@ -322,7 +339,7 @@ namespace token {
         // Prepare buffers
         uint8_t ciphertext[innerToken.length()] = {};
         uint8_t mac[16] = {};
-        
+
         // Get key
         size_t key_size = strlen(OBFUSCATE(ENVELOPE_KEY));
         uint8_t* key = new uint8_t[key_size];
