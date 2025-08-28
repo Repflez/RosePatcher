@@ -10,12 +10,12 @@
 #include <notifications/notifications.h>
 
 #include "ssl.hpp"
-#include "../config.hpp"
-#include "../utils/Notification.hpp"
-#include "../utils/logger.h"
-#include "../utils/utils.hpp"
-#include "../utils/patch.hpp"
-#include "../utils/token.hpp"
+#include "config.hpp"
+#include "utils/Notification.hpp"
+#include "utils/logger.h"
+#include "utils/utils.hpp"
+#include "utils/patch.hpp"
+#include "utils/token.hpp"
 
 PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;

@@ -1,7 +1,7 @@
 #pragma once
 #include <coreinit/dynload.h>
 
-#include "../utils/logger.h"
+#include "utils/logger.h"
 
 namespace patches::olv {
     extern const char original_discovery_url[];

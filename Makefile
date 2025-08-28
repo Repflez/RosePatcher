@@ -21,7 +21,7 @@ WUMS_ROOT := $(DEVKITPRO)/wums
 #-------------------------------------------------------------------------------
 TARGET		:=	rverse
 BUILD		:=	build
-SOURCES		:=	src src/utils src/patches
+SOURCES		:=	src src/utils src/patches src/vendor
 DATA		:=	data
 INCLUDES	:=	src
 

@@ -10,9 +10,9 @@
 #include <optional>
 
 #include "olvFix.hpp"
-#include "../config.hpp"
-#include "../utils/patch.hpp"
-#include "../utils/logger.h"
+#include "config.hpp"
+#include "utils/patch.hpp"
+#include "utils/logger.h"
 
 #include "chain_pem.h" // generated at buildtime
 

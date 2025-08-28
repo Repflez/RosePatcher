@@ -2,7 +2,7 @@
 #define CRYPTOSYSTEM_HPP
 
 #include <array>
-#include "meta_random.hpp"
+#include "vendor/meta_random.hpp"
 
 namespace snowapril {
 

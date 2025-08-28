@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "utils.hpp"
-#include "../config.hpp"
+#include "config.hpp"
 
 #define OLV_TITLE_ID_JP 0x000500301001600A
 #define OLV_CLIENT_ID_JP "a2efa818a34fa16b8afbc8a74eba3eda" // REPLACEME

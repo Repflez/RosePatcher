@@ -4,10 +4,10 @@
 
 #include "ssl.hpp"
 
-#include "../utils/Notification.hpp"
-#include "../utils/logger.h"
-#include "../utils/patch.hpp"
-#include "../config.hpp"
+#include "utils/Notification.hpp"
+#include "utils/logger.h"
+#include "utils/patch.hpp"
+#include "config.hpp"
 
 #include "gts_der.h" // Included at runtime
 

@@ -23,9 +23,9 @@
 #include "logger.h"
 #include "Notification.hpp"
 #include "base64.hpp"
-#include "obfuscate.hpp"
-#include "monocypher.h"
-#include "monocypher-ed25519.h"
+#include "vendor/obfuscate.hpp"
+#include "vendor/monocypher.h"
+#include "vendor/monocypher-ed25519.h"
 
 extern "C" MCPError MCP_GetDeviceId(int handle, char* out);
 extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
