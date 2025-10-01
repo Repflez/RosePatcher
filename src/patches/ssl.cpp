@@ -13,16 +13,12 @@
 
 namespace patches::ssl {
     void addCertificateToWebKit() {
-        if (config::certificateAdded) {
-            return;
-        }
+        if (!config::goodToGo) return;
+        if (!config::connectToRverse) return;
+        if (config::certificateAdded) return;
 
         OSDynLoad_Module libwkc = 0;
         void* (*WKC_SSLRegisterRootCAByDER)(const char* cert, int cert_len) = nullptr;
-
-        if (!config::connectToRverse) {
-            return;
-        }
 
         OSDynLoad_Error ret = OSDynLoad_IsModuleLoaded("libwkc", &libwkc);
 
@@ -42,7 +38,7 @@ namespace patches::ssl {
 }; // namespace ssl
 
 DECL_FUNCTION(NSSLError, NSSLAddServerPKI, NSSLContextHandle context, NSSLServerCertId pki) {
-    if (config::connectToRverse && !config::gtsAdded) {
+    if (config::connectToRverse && !config::gtsAdded && config::goodToGo) {
         NSSLAddServerPKIExternal(context, gts_der, gts_der_size, 0);
         DEBUG_FUNCTION_LINE("Added GTS certificate to NSSL context");
         config::gtsAdded = true;

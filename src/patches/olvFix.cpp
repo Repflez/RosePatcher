@@ -39,6 +39,7 @@ namespace patches::olv {
     void osdynload_notify_callback(OSDynLoad_Module module, void *ctx,
                                    OSDynLoad_NotifyReason reason, OSDynLoad_NotifyData *rpl) {
         if (reason == OS_DYNLOAD_NOTIFY_LOADED) {
+            if (!config::goodToGo) return;
             if (!rpl->name) return;
             if (!std::string_view(rpl->name).ends_with("nn_olv.rpl") || !config::connectToRverse)
                 return;
@@ -62,7 +63,7 @@ namespace patches::olv {
     }
 
     bool Initialize() {
-        if (config::connectToRverse) {
+        if (config::connectToRverse && config::goodToGo) {
             OSDynLoad_AddNotifyCallback(&patches::olv::osdynload_notify_callback, nullptr);
 
             bool loadedLibs = CheckForOlvLibraries();
@@ -90,7 +91,7 @@ DECL_FUNCTION(int, FSOpenFile_OLV, FSClient *client, FSCmdBlock *block, char *pa
               int error) {
     const char *initialOmaPath = "vol/content/initial.oma";
 
-    if (config::connectToRverse) {
+    if (config::connectToRverse && config::goodToGo) {
         if (strcmp(initialOmaPath, path) == 0) {
             // This is a hack
             auto ok = patches::olv::Initialize();
@@ -116,22 +117,26 @@ DECL_FUNCTION(int, FSOpenFile_OLV, FSClient *client, FSCmdBlock *block, char *pa
 
 DECL_FUNCTION(FSStatus, FSReadFile_OLV, FSClient *client, FSCmdBlock *block, uint8_t *buffer, uint32_t size, uint32_t count,
               FSFileHandle handle, uint32_t unk1, uint32_t flags) {
-    if (size != 1) {
-        DEBUG_FUNCTION_LINE("Miiverse CA replacement failed");
-    }
+    if (config::connectToRverse && config::goodToGo) {
+        if (size != 1) {
+            DEBUG_FUNCTION_LINE("Miiverse CA replacement failed");
+        }
 
-    if (rootCAPemHandle && *rootCAPemHandle == handle) {
-        strlcpy((char *) buffer, (const char *) chain_pem, size * count);
+        if (rootCAPemHandle && *rootCAPemHandle == handle) {
+            strlcpy((char *) buffer, (const char *) chain_pem, size * count);
 
-        return (FSStatus) count;
+            return (FSStatus) count;
+        }
     }
 
     return real_FSReadFile_OLV(client, block, buffer, size, count, handle, unk1, flags);
 }
 
 DECL_FUNCTION(FSStatus, FSCloseFile_OLV, FSClient *client, FSCmdBlock *block, FSFileHandle handle, FSErrorFlag errorMask) {
-    if (handle == rootCAPemHandle) {
-        rootCAPemHandle.reset();
+    if (config::connectToRverse && config::goodToGo) {
+        if (handle == rootCAPemHandle) {
+            rootCAPemHandle.reset();
+        }
     }
 
     return real_FSCloseFile_OLV(client, block, handle, errorMask);

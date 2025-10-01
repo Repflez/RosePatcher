@@ -54,4 +54,13 @@ namespace utils {
     bool is555OrHigher() {
         return getSystemVersion().major == 5 && getSystemVersion().minor == 5 && getSystemVersion().patch >= 5 && (getSystemVersion().region == 'U' || getSystemVersion().region == 'E' || getSystemVersion().region == 'J');
     }
+
+    std::string ToHexString(const void* data, size_t size)
+    {
+        std::string str;
+        for (size_t i = 0; i < size; ++i)
+            str += utils::sprintf("%02x", ((const uint8_t*) data)[i]);
+
+        return str;
+    }
 }; // namespace utils

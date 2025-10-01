@@ -21,7 +21,7 @@ PatchedFunctionHandle AISTpatchHandleBetter = 0;
 int AISTCallCount = 0;
 
 DECL_FUNCTION(int, AcquireIndependentServiceToken__Q2_2nn3actFPcPCcUibT4, uint8_t* token, const char* client_id) {
-    if (client_id && utils::isMiiverseClientID(client_id) && config::connectToRverse) {
+    if (client_id && utils::isMiiverseClientID(client_id) && config::connectToRverse && config::goodToGo) {
         AISTCallCount++;
         DEBUG_FUNCTION_LINE("AISTCallCount is %d!", AISTCallCount);
         patches::ssl::addCertificateToWebKit();
@@ -70,6 +70,11 @@ DECL_FUNCTION(void, NSSLInit) {
 
     if (!config::connectToRverse) {
         DEBUG_FUNCTION_LINE("\"Connect to rverse\" patch is disabled, skipping...");
+        return;
+    }
+
+    if (!config::goodToGo) {
+        DEBUG_FUNCTION_LINE("Error loading rverse, skipping...");
         return;
     }
 

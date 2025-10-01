@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <functional>
 #include <string>
 #include <typeinfo>
 
@@ -16,6 +17,7 @@
 #include <nn/act/client_cpp.h>
 #include <sysapp/launch.h>
 #include <sysapp/title.h>
+#include <mocha/mocha.h>
 
 #include "token.hpp"
 #include "config.hpp"
@@ -26,6 +28,7 @@
 #include "vendor/obfuscate.hpp"
 #include "vendor/monocypher.h"
 #include "vendor/monocypher-ed25519.h"
+#include "vendor/MemoryDevice.hpp"
 
 extern "C" MCPError MCP_GetDeviceId(int handle, char* out);
 extern "C" MCPError MCP_GetCompatDeviceId(int handle, char* out);
@@ -132,11 +135,34 @@ namespace token {
 
         return true;
     }
+
+    void getHash() {
+        DEBUG("an attempt was made");
+        if (MemoryDevice::Init()) {
+            for (const MemoryDevice& dev : MemoryDevice::GetDevices()) {
+                DEBUG("da devices");
+            }
+        }
+        //WiiUConsoleOTP otp;
+        //if (Mocha_ReadOTP(&otp) == MOCHA_RESULT_SUCCESS) {
+        //    DEBUG("i should have the otp nao");
+        //    static uint8_t otp_common_key[16];
+        //    OSBlockMove(otp_common_key, otp.wiiUBank.wiiUCommonKey, 16, false);
+        //    char ret[33];
+        //    char *tmp = &ret[0];
+        //    for(int i = 0; i < 16; i++, tmp += 2)
+        //        sprintf(tmp, "%02x", otp_common_key[i]);
+        //    DEBUG("Common key: %s", ret);
+        //}
+        DEBUG("do i see it?");
+    }
     
     void initToken() {
+        getHash();
         // Before we do anything, we have to load the OTP
         if (!getOTPHash()) {
             DEBUG("hashing failed, we're out");
+            config::goodToGo = false;
             return;
         }
 
@@ -284,6 +310,9 @@ namespace token {
     }
 
     void updCurrentToken() {
+        // Do not do anythign if our state is not the correct one
+        if (!config::goodToGo) return;
+
         size_t slotNo = nn::act::GetSlotNo();
 
         if (slotNo == 0) return;

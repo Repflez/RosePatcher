@@ -8,6 +8,7 @@
 #include <nn/act/client_cpp.h>
 #include <nn/result.h>
 #include <notifications/notifications.h>
+#include <mocha/mocha.h>
 
 #include "config.hpp"
 #include "tokenthread.hpp"
@@ -25,6 +26,8 @@ WUPS_PLUGIN_LICENSE("GPLv2");
 WUPS_USE_STORAGE("rverse");
 WUPS_USE_WUT_DEVOPTAB();
 
+MochaUtilsStatus status;
+
 INITIALIZE_PLUGIN() {
   // Initialize libraries
   WHBLogModuleInit();
@@ -35,6 +38,12 @@ INITIALIZE_PLUGIN() {
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
   config::InitializeConfig();
+
+  status = Mocha_InitLibrary();
+  if (status != MOCHA_RESULT_SUCCESS) {
+    DEBUG("Mocha is unable ts start: 0x%8X", status);
+    config::goodToGo = false;
+  }
 
   // Check if NotificationModule library is initialized
   if (NotificationModule_InitLibrary() != NOTIFICATION_MODULE_RESULT_SUCCESS) {
@@ -48,13 +57,14 @@ INITIALIZE_PLUGIN() {
       ShowNotification("rverse patch disabled");
     }
   } else {
-    ShowNotification("rverse patch error. Please follow the instructions when installing.");
+    ShowNotification("rverse patch error. Please report this error.");
   }
 }
 
 DEINITIALIZE_PLUGIN() {
   curl_global_cleanup();
 
+  Mocha_DeInitLibrary();
   nn::act::Finalize();
   WHBLogModuleDeinit();
   WHBLogUdpDeinit();
@@ -68,23 +78,28 @@ ON_APPLICATION_START() {
   WHBLogUdpInit();
   WHBLogCafeInit();
 
-  patches::olv::Initialize();
-  nn::ac::Initialize();
-  nn::ac::ConnectAsync();
-  nn::act::Initialize();
+  if (config::goodToGo) {
+    patches::olv::Initialize();
 
-  auto title = OSGetTitleID();
+    nn::ac::Initialize();
+    nn::ac::ConnectAsync();
+    nn::act::Initialize();
 
-  tokenthread::CreateTokenThread();
-  if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
-    tokenthread::should_kill = true;
+    auto title = OSGetTitleID();
+
+    tokenthread::CreateTokenThread();
+    if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
+      tokenthread::should_kill = true;
+    }
   }
 }
 
 ON_APPLICATION_ENDS() {
-  auto title = OSGetTitleID();
-  if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
-    tokenthread::should_kill = true;
+  if (config::goodToGo) {
+    auto title = OSGetTitleID();
+    if (title != 0x5001010040000 && title != 0x5001010040100 && title != 0x5001010040200) {
+      tokenthread::should_kill = true;
+    }
   }
 }
 
@@ -93,7 +108,7 @@ DECL_FUNCTION(nn::Result, LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb, 
   // we should load first
   nn::Result ret = real_LoadConsoleAccount__Q2_2nn3actFUc13ACTLoadOptionPCcb(slot, unk1, unk2, unk3);
 
-  tokenthread::should_run_once = true;
+  if (config::goodToGo) tokenthread::should_run_once = true;
 
   return ret;
 }

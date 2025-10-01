@@ -6,9 +6,24 @@
 
 #include <cstring>
 #include <string>
+#include <memory>
 #include <vector>
 
 namespace utils {
+    template<typename ...Args>
+    std::string sprintf(const std::string& format, Args ...args)
+    {
+        int size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1;
+
+        std::unique_ptr<char[]> buf(new char[size]);
+        std::snprintf(buf.get(), size, format.c_str(), args ...);
+
+        return std::string(buf.get(), buf.get() + size - 1);
+    }
+
+    std::string ToHexString(const void* data, size_t size);
+
+
     bool isMiiverseClientID(const char *client_id);
     bool isMiiverseTitleID(uint32_t title_id);
 
